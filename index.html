@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Start Game</title>
+ <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Blinker:wght@100;200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+      <div class="container">
+    <h1 class="blinker-bold">ID: Unknown</h1>
+    <h2 class="blinker-regular">Can you spot the human from the AI?<p>Analyse messages, check profiles, and uncover who’s real… before it’s too late.</p></h2>
+    <button class="start-btn" id="startMusic" onclick="window.location.href='instructions.html'">START</button>
+    
+
+  <div class="files-container">
+    <div class="file-row">
+      <div class="file-case">File 1</div>
+      <div class="file-case">File 2</div>
+      <div class="file-case">File 3</div>
+    </div>
+    
+<div class="files-container">
+  <div class="file-row">
+    <div class="file-case">
+      <img src="images/johnathan.jpg" alt="File 1">
+    </div>
+    <div class="file-case">
+      <img src="images/queen.jpg" alt="File 2">
+    </div>
+    <div class="file-case">
+      <img src="images/kai.jpg" alt="File 3">
+    </div>
+  </div>
+</div>
+<audio id="nextSound" src="images/next.mp3" preload="auto"></audio>
+
+</body>
+
+<script>
+function playAndNavigate() {
+  const sound = document.getElementById('nextSound');
+
+  sound.currentTime = 0;
+  sound.play();
+
+  sound.onended = () => {
+    window.location.href = 'instructions.html';
+  };
+}
+</script>
+</html>
+
+
+<style>
+h1 {
+  font-size: 36px;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--text-muted);
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+.start-btn {
+  margin-top: 30px;
+  padding: 10px 30px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  background: transparent;
+  background: #9aa5ff;
+  color: #0f1220;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+
+}
+
+.start-btn:hover {
+  background: #9aa5ff;
+  color: #0f1220;  color: white;
+}
+
+</style>

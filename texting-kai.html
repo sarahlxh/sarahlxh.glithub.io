@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <title>texting kai</title>
+ <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Blinker:wght@100;200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="text-interface">
+<div class="container">
+<div class="files-vertical">
+      <div class="file-case">
+        <img src="images/johnathan_selected.jpg" alt="File 1">
+      </div>
+
+      <div class="file-case">
+        <img src="images/queen_selected.jpg" alt="File 2">
+      </div>
+
+      <div class="file-case">
+        <img src="images/kai.jpg" alt="File 3">
+      </div>
+    </div>  
+
+    <!-- Chat notification and chat area -->
+    <div class="texting-container">
+    <div class="chat-header">
+  <img src="images/kai_photo.jpg" alt="Kai" class="chat-profile-pic">
+  <div class="chat-profile-name">Kai</div>
+</div>
+      <div class="notification-popup" id="notification">
+        Kai has sent you a message!<br>
+        <span> Click to open</span>
+      </div>
+
+      <!-- Chat Window -->
+      <div class="chat-window" id="chatWindow">
+        <div class="messages" id="chatMessages"></div>
+
+<!-- Response Options -->
+<div class="response-options" id="responseOptions">
+  <button id="oneBtn">Awww, let's just chat here 😊!</button>
+  <button id="twoBtn">Sure, here's my Telegram (@pinkleaves). Let's switch over 😉</button>
+</div>
+
+ <div class="response-options" id="linkDecisionOptions">
+    <button id="ignoreLinkBtn">Sorry Kai, I'm not lending money to people I have not met in person before😊</button>
+    <button id="clickLinkBtn">Oh no, how much do you need? I can help😅</button>
+  </div>
+
+        <!-- Typing Box -->
+ <div class="typing-box-bottom">
+  <input type="text" placeholder="Type a message..." disabled>
+  <button disabled>Send</button>
+</div>
+      </div>
+    </div>
+<div class="scam-overlay" id="scamOverlay">
+<div class="scam-popup">
+  <h2>⚠️ This may be a love scam</h2>
+  <p class="scam-instruction">Click all red flags to learn why before continuing</p>
+
+  <div class="scam-content">
+    <ul class="red-flags">
+  <li data-info="
+    <h3>📲 Moving Off-Platform Early</h3>
+    <p>Scammers often ask to switch apps very quickly.</p>
+    <p><strong>Why it’s suspicious:</strong> External platforms reduce moderation and reporting.
+  ">
+    📲 Asked to move to Telegram
+  </li>
+
+  <li data-info="
+    <h3>🔒 Privacy as a Persuasion Tool</h3>
+    <p>Privacy is framed as something romantic or special</p>
+    <p><strong>Why it’s suspicious:</strong> Scammers use ‘private’ spaces to isolate victims.</p>
+  ">
+   🔒 “It’s more private there”
+  </li>
+
+  <li data-info="
+    <h3>⏳ Rapid Emotional Progress</h3>
+    <p>The connection escalates faster than normal</p>
+    <p><strong>Why it’s suspicious:</strong> Love scammers rush emotional intimacy.</p>
+  ">
+    ⏳ Pushes closeness early  
+</li>
+
+  <li data-info="
+    <h3>🕵️ Avoiding Platform Rules</h3>
+    <p>Dating platforms track suspicious behaviour.</p>
+    <p><strong>Why it’s suspicious:</strong> Scammers prefer spaces without safeguards.</p>
+  ">
+🕵️ Wants to chat elsewhere
+  </li>
+</ul>
+
+    <div class="flag-info" id="flagInfo">
+      Select a red flag to see why it’s dangerous.
+    </div>
+  </div>
+
+<button id="continueBtn" class="continue-btn hidden">
+  Continue
+</button>
+  </div>
+</div>
+<div class="scam-overlay" id="choiceOverlay">
+  <div class="scam-popup" id="choicePopup">
+    <h2 id="choiceTitle">⚠️ Feedback</h2>
+    <p id="choiceMessage">You chose...</p>
+
+  <div class="typing-box-bottom">
+    <input type="text" placeholder="Type a message..." disabled>
+    <button disabled>Send</button>
+  </div>
+</div>
+    <button id="closeChoiceBtn" style="margin-top: 12px; display: none;">Close</button>
+  </div>
+
+
+<div class="scam-overlay" id="successOverlay">
+  <div class="scam-popup">
+    <h2 style="color:#4ade80;">🎉 Well done!</h2>
+    <p>
+     You spotted the red flags and stayed safe.
+      <br><br>
+      <strong>Great job protecting yourself!</strong>
+    </p>
+    <button onclick="Ending()">Yay!</button>
+  </div>
+</div>
+
+<div class="scam-overlay" id="wrongChoiceOverlay">
+  <div class="scam-popup">
+    <h2 style="color:#ff6b6b;">❌ Oh no…</h2>
+    <p>
+      By trusting too quickly, you could’ve exposed yourself to a love scam.
+      <br><br>
+      • Never send money or personal info 
+      • Don’t move off-platform too quickly
+      • Slow down and trust your gut
+      <br><br>
+     Love scammers flatter you to gain your trust, Be careful online, they may not be who you think they are
+    </p>
+    <button onclick="Ending()">Continue</button>
+  </div>
+</div>
+</div>
+</div>
+<audio id="clickSound" src="images/next.mp3" preload="auto"></audio>
+</body>
+
+  <script>
+    const notification = document.getElementById('notification');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatMessages = document.getElementById('chatMessages');
+    const responseOptions = document.getElementById('responseOptions');
+
+    // Show notification after 1s
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 1000);
+
+const clickSound = document.getElementById("clickSound");
+notification.addEventListener('click', () => {
+  clickSound.currentTime = 0; // reset to start
+  clickSound.play();
+
+  notification.style.transition = 'all 0.5s ease';
+  notification.style.transform = 'translateY(-50px)';
+  notification.style.opacity = '0';
+
+  setTimeout(() => {
+    notification.style.display = 'none';
+    chatWindow.style.display = 'flex';
+
+    addKaiMessageWithTyping(
+      "Hey I think you're really cute! Let's take it to Telegram to get to know each other better 😉!",
+      2000,
+      () => {
+        responseOptions.style.display = 'flex';
+      }
+    );
+
+  }, 500);
+});
+
+
+const oneBtn = document.getElementById("oneBtn");
+const twoBtn = document.getElementById("twoBtn");
+const messages = document.querySelector(".messages");
+
+function addKaiMessageWithTyping(text, delay = 2000, onComplete) {
+  const typing = document.createElement('div');
+  typing.className = 'message typing';
+  typing.innerHTML = `
+    <div class="sender">Kai</div>
+    <div class="bubble">Kai is typing...</div>
+  `;
+  messages.appendChild(typing);
+  messages.scrollTop = messages.scrollHeight;
+
+  setTimeout(() => typing.classList.add('show'), 50);
+
+  setTimeout(() => {
+    typing.remove();
+    addKaiMessage(text);
+
+    // ✅ ONLY NOW show options
+    if (typeof onComplete === "function") {
+      onComplete();
+    }
+  }, delay);
+}
+
+oneBtn.addEventListener("click", () => {
+clickSound.currentTime = 0;
+  clickSound.play();
+  responseOptions.style.display = "none";
+  addUserMessage("Awww, let's just chat here 😊!");
+
+  // 2️⃣ Kai responds after typing
+  setTimeout(() => {
+    addKaiMessageWithTyping(
+      "Okay love 😘. Actually I'm dealing with some bank issues overseas... need help with a bit of cash.",
+      2000,
+      () => {
+        document.getElementById("linkDecisionOptions").style.display = "flex";
+      }
+    );
+  }, 600);
+});
+
+twoBtn.addEventListener("click", () => {
+ clickSound.currentTime = 0;
+  clickSound.play();
+responseOptions.style.display = "none";
+  document.getElementById("scamOverlay").classList.add("show");
+});
+
+oneBtn.addEventListener("click", () => {
+  responseOptions.style.display = "none";
+
+  addKainMessageWithTyping(
+    "You have won a $1,000 shopping voucher from a popular online retailer!",
+    2000,
+    () => {
+      const options = document.getElementById("linkDecisionOptions");
+      options.style.display = "flex";
+      options.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  );
+});
+
+
+function addKaiMessage(text) {
+  const msg = document.createElement("div");
+  msg.className = "message Kai";
+  msg.innerHTML = `
+    <div class="sender">Kai</div>
+    <div class="bubble">${text}</div>
+  `;
+  messages.appendChild(msg);
+
+  setTimeout(() => msg.classList.add("show"), 100);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function showResponseOptions() {
+  responseOptions.style.display = 'flex';
+  responseOptions.scrollIntoView({ behavior: "smooth", block: "end" });
+}
+
+function hideResponseOptions() {
+  responseOptions.style.display = 'none';
+}
+
+function showChoicePopup(title, message, choices = []) {
+  const overlay = document.getElementById('choiceOverlay'); 
+  const popup = document.getElementById('choicePopup');
+  const choiceTitle = document.getElementById('choiceTitle');
+  const choiceMessage = document.getElementById('choiceMessage');
+  const nextChoices = document.getElementById('nextChoices');
+  const closeBtn = document.getElementById('closeChoiceBtn');
+
+  // Fill popup content
+  choiceTitle.textContent = title;
+  choiceMessage.textContent = message;
+
+  // Clear old buttons
+  nextChoices.innerHTML = '';
+
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.textContent = choice.text;
+    btn.style.background = '#9aa5ff';
+    btn.addEventListener('click', choice.onClick);
+    nextChoices.appendChild(btn);
+  });
+
+  // Show overlay and popup
+  overlay.classList.add('show');
+  popup.classList.add('show');
+
+  // Show close button only if provided
+  if (choices.length === 0) {
+    closeBtn.style.display = 'block';
+    closeBtn.onclick = () => {
+      overlay.classList.remove('show');
+      popup.classList.remove('show');
+    }
+  } else {
+    closeBtn.style.display = 'none';
+  }
+}
+
+function addUserMessage(text) {
+  const msg = document.createElement("div");
+  msg.className = "message user";
+  msg.innerHTML = `
+    <div class="sender">You</div>
+    <div class="bubble">${text}</div>
+  `;
+
+  messages.appendChild(msg);
+
+  setTimeout(() => msg.classList.add("show"), 50);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// Close button inside popup
+document.getElementById('closeChoiceBtn').addEventListener('click', () => {
+  document.getElementById('choicePopup').classList.remove('show');
+});
+
+const flags = document.querySelectorAll(".red-flags li");
+const flagInfo = document.getElementById("flagInfo");
+const continueBtn = document.getElementById("continueBtn");
+
+let readFlags = new Set();
+
+flags.forEach(flag => {
+  flag.addEventListener("click", () => {
+    // Show explanation
+    flagInfo.innerHTML = flag.dataset.info;
+
+    // Mark as read only once
+    if (!flag.classList.contains("active")) {
+      flag.classList.add("active");
+      readFlags.add(flag);
+    }
+
+    // Show Continue only when all flags clicked
+    if (readFlags.size === flags.length) {
+      continueBtn.classList.remove("hidden");
+    }
+  });
+});
+
+continueBtn.addEventListener("click", () => {
+clickSound.currentTime = 0;
+clickSound.play();
+  document.getElementById("scamOverlay").classList.remove("show");
+
+  // 2️⃣ Reset overlay state
+  readFlags.clear();
+  flags.forEach(flag => flag.classList.remove("active"));
+  flagInfo.innerHTML = "Select a red flag to see why it’s dangerous.";
+  continueBtn.classList.add("hidden");
+
+  // 3️⃣ Resume chat after short pause
+  setTimeout(() => {
+    addKaiMessageWithTyping(
+      "Actually I'm dealing with some bank issues overseas... need help with a bit of cash?",
+      2500,
+      () => {
+        // 4️⃣ Show next decision options
+        document.getElementById("linkDecisionOptions").style.display = "flex";
+      }
+    );
+  }, 600);
+});
+
+continueBtn.addEventListener("click", () => {
+clickSound.currentTime = 0;
+  clickSound.play();
+  document.getElementById("scamOverlay").classList.remove("show");
+  readFlags.clear();
+  flags.forEach(flag => flag.classList.remove("active"));
+  flagInfo.innerHTML = "Select a red flag to see why it’s dangerous.";
+  continueBtn.classList.add("hidden");
+});
+
+const ignoreLinkBtn = document.getElementById("ignoreLinkBtn");
+const clickLinkBtn = document.getElementById("clickLinkBtn");
+
+ignoreLinkBtn.addEventListener("click", () => {
+     clickSound.currentTime = 0;
+  clickSound.play();
+  document.getElementById("linkDecisionOptions").style.display = "none";
+  document.getElementById("successOverlay").classList.add("show");
+});
+
+clickLinkBtn.addEventListener("click", () => {
+     clickSound.currentTime = 0;
+  clickSound.play();
+  document.getElementById("linkDecisionOptions").style.display = "none";
+  document.getElementById("wrongChoiceOverlay").classList.add("show");
+});
+
+function Ending() {
+  window.location.href = "ending.html"; 
+  // or trigger your existing case logic
+}
+  </script>
+</body>
+</html>
+
+
+<style>
+.chat-header {
+  width: 800px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(40,45,80,0.95);
+  border-radius: 16px 16px 0 0; /* rounded top corners */
+  margin-bottom: 10px;
+}
+
+/* Profile photo */
+.chat-profile-pic {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #9aa5ff;
+}
+
+/* Profile name */
+.chat-profile-name {
+  font-family: 'Blinker', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+ .texting-container {
+  position: absolute;
+  top: 0px;          /* distance from the top */
+  left: 50%;          /* start at the middle of the parent */
+  transform: translateX(-50%); /* shift left by half its width */
+  width: 420px;
+  min-height: 400px;
+  font-family: 'Blinker', sans-serif;
+  z-index: 50;
+}
+
+ /* Notification popup */
+.notification-popup {
+      background: rgba(95,126,164,0.9);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      top: 0px;
+      left: 0px;
+      color: #fff;
+      text-align: center;
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(-30px);
+      transition: all 0.5s ease;
+    }
+
+    .notification-popup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+.notification-popup span:hover {
+  color: #ffffff; 
+  background: #7f8fff;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+    .notification-popup span {
+      display: inline-block;
+      margin-top: 10px;
+      background: #9aa5ff;
+      color: #0f1220;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    /* Chat window */
+.chat-window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: rgba(20,24,45,0.95);
+  width: 680px;
+  height: 450px;
+  border-radius: 16px;
+  padding: 15px;
+}
+
+/* Messages */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Individual message container */
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 80%;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.5s ease;
+}
+
+/* Show animation */
+.message.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.message .sender {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9aa5ff;
+  margin-left: 8px;
+}
+
+/* Bubble for the text */
+.message .bubble {
+  background: rgba(154,165,255,0.85);
+  color: #0f1220;
+  padding: 12px 16px;
+  border-radius: 18px 18px 18px 4px; /* classic chat bubble style */
+  align-self: flex-start;
+  word-wrap: break-word;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.message.user {
+  align-self: flex-end;
+  max-width: 60%;
+}
+
+.message.user .sender {
+  text-align: right;
+  color: #ffffff;
+  margin-right: 8px;
+}
+
+.message.user .bubble {
+  background: #ffffff;     /* 🔑 white bubble */
+  color: #0f1220;
+  border-radius: 18px 18px 4px 18px; /* mirrored tail */
+  align-self: flex-end;
+}
+
+    /* Response options */
+.response-options {
+  position: absolute;
+  bottom: 90px; /* sits nicely above typing box */
+  left: 50%;
+  transform: translateX(-50%);
+  
+  display: none;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  width: 100%;
+  z-index: 90;
+}
+
+.response-options button {
+  background: #ffffff;
+  color: #0f1220;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  align-items: center;
+  transition: transform 0.2s ease;
+  width: 200px;
+  position: sticky;
+}
+
+.response-options button:hover {
+transform: scale(1.05);
+      color: rgba(154,165,255,0.85);
+    }
+
+.typing-box-bottom {
+  position: absolute;
+  bottom: 20px;               /* distance from bottom */
+  left: 20px;                 /* align with container's left padding */
+  right: 20px;                /* extend to right edge */
+  width: 680px;                /* let left & right control width */
+  display: flex;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(40, 45, 80, 0.9);   /* match chat theme */
+  border-radius: 20px;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(154, 165, 255, 0.3);
+}
+
+.typing-box-bottom input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.95);  /* slightly off-white */
+  color: #0f1220;
+  font-family: 'Blinker', sans-serif;
+  font-size: 14px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.typing-box-bottom input::placeholder {
+  color: #7a7f9a;
+  font-style: italic;
+}
+
+.typing-box-bottom button {
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #9aa5ff, #b3bcff);
+  color: #0f1220;
+  font-weight: 700;
+  font-family: 'Blinker', sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.typing-box-bottom button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(154, 165, 255, 0.4);
+}
+
+.typing-box-bottom button:disabled {
+  background: rgba(154, 165, 255, 0.4);
+  cursor: not-allowed;
+}
+    .typing-box {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      width: 500px;
+    }
+
+    .typing-box input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    .typing-box button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      background: #9aa5ff;
+      color: #0f1220;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .typing-box button:hover {
+      transform: scale(1.05);
+    }
+
+
+.scam-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 12, 30, 0.75);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 200;
+
+  /* 🔑 HIDDEN BY DEFAULT */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.scam-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scam-popup {
+  width: 600px;
+  padding: 28px;
+  background: linear-gradient(
+    180deg,
+    rgba(40,45,80,0.95),
+    rgba(20,24,45,0.95)
+  );
+  border-radius: 18px;
+  text-align: center;
+  font-family: 'Blinker', sans-serif;
+  color: #f1f5f9;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+  animation: popIn 0.35s ease;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.scam-popup h2 {
+  margin-bottom: 12px;
+  color: #ff6b6b;
+}
+
+.scam-popup p {
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 22px;
+}
+
+.scam-popup button {
+  padding: 10px 22px;
+  border-radius: 20px;
+  border: none;
+  background: #9aa5ff;
+  color: #0f1220;
+  font-family: 'Blinker', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scam-popup button:hover {
+  background: #b3bcff;
+}
+
+.red-flags {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.red-flags li {
+  background: rgba(255, 107, 107, 0.15);
+  border: 1px solid rgba(255, 107, 107, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.red-flags li:hover {
+  background: rgba(255, 107, 107, 0.25);
+  transform: scale(1.03);
+}
+
+.red-flags li.active {
+  background: rgba(255, 107, 107, 0.35);
+  transform: scale(1.05);
+}
+
+.scam-content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 18px;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.flag-info {
+  background: rgba(95,126,164,0.2);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 120px;
+
+  /* 🔑 stack content vertically */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;   /* left aligned */
+  justify-content: flex-start;
+  gap: 6px;                  /* space between h4 & p */
+}
+
+
+
+#tryAgainBtn:disabled {
+  background: rgba(154,165,255,0.4);
+  cursor: not-allowed;
+}
+
+#tryAgainBtn.enabled {
+  background: #9aa5ff;
+  cursor: pointer;
+}
+
+.choice-buttons button {
+  color: #0f1220;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+.choice-buttons button:hover {
+  transform: scale(1.05);
+}
+
+.choice-popup {
+  position: absolute; /* inside container */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* center in container */
+  width: 90%; /* smaller than chat window */
+  max-width: 360px;
+  background: linear-gradient(180deg, rgba(40,45,80,0.95), rgba(20,24,45,0.95));
+  border-radius: 18px;
+  padding: 20px;
+  text-align: center;
+  color: #f1f5f9;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  font-family: 'Blinker', sans-serif;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.choice-popup.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.message.typing .bubble {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.continue-btn {
+  margin-top: 20px;
+  padding: 12px 26px;
+  border-radius: 22px;
+  border: none;
+  background: #9aa5ff;
+  color: #0f1220;
+  font-family: 'Blinker', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+/* Hidden state */
+.continue-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+#linkDecisionOptions {
+  display: none;
+}
+
+.text-interface .files-vertical {
+  position: absolute;       
+  top: -50px;                
+  left: -60px;               
+  display: flex;
+  flex-direction: column;   
+  gap: 0px;                /* space between files */
+  z-index: 10;
+  
+}
+
+/* Rotate the entire card */
+.text-interface .files-vertical .file-case:nth-child(1) {
+  transform: rotate(60deg);   /* rotate the card */
+  z-index: 10;
+}
+
+.text-interface .files-vertical .file-case:nth-child(2) {
+  transform: rotate(60deg);
+  z-index: 20;
+}
+
+.text-interface .files-vertical .file-case:nth-child(3) {
+  transform: scale(1.3) rotate(60deg);
+  z-index: 30;
+  
+}
+
+/* Keep the image upright inside the rotated card */
+.text-interface .files-vertical .file-case img {
+  transform: rotate(0deg);  /* reset image rotation */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.text-interface .files-vertical .file-case:last-child img {
+  box-shadow:
+    0 0 18px rgba(0, 122, 255, 0.55),
+    0 0 36px rgba(0, 122, 255, 0.25),
+    0 25px 40px rgba(0,0,0,0.3);
+  transition: none; /* no animation on hover */
+}
+.text-interface .files-vertical .file-case:not(:last-child):hover {
+  transform: translateY(-30px) scale(1.1) rotate(60deg);
+  box-shadow:
+    0 0 18px rgba(0, 122, 255, 0.55),
+    0 0 36px rgba(0, 122, 255, 0.25),
+    0 25px 40px rgba(0,0,0,0.3); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+  </style>
+</head>
+<body>
+  
+  

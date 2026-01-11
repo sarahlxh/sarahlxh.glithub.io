@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <title>kai profile</title>
+ <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Blinker:wght@100;200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="profile-page">
+  <div class="container">
+<div class="profile-kai">
+  <div class="profile-left">
+<img src="images/kai_photo.jpg"
+  alt="kai"
+   class="kai-image hover-zoom"
+  data-question="What can we conclude from this profile photo alone?"
+  data-options="It proves the person is fake|It proves the person is real|It looks normal but doesn’t prove anything"
+  data-answer="2">
+  </div>
+
+  <div class="profile-right">
+<div
+  class="kai-username hover-zoom"
+  data-question="What can we conclude from Kai’s username?"
+  data-options="It proves the account is fake|It proves the account is real|It doesn’t tell us enough on its own"
+  data-answer="2">
+kaitwist
+</div>
+
+<div
+  class="kai-name hover-zoom"
+  data-question="What can we conclude from Kai’s name and pronouns?"
+  data-options="They confirm Kai is trustworthy|They confirm Kai is a scammer|They look normal but don’t prove anything"
+  data-answer="2">
+Kai (he/him)
+</div>
+
+<div
+  class="kai-bio hover-zoom"
+  data-question="What can we conclude from Kai’s bio, “lost in the ordinary”?"
+  data-options="It confirms emotional manipulation|It confirms he is genuine|It sounds vague and doesn’t prove anything"
+  data-answer="2">
+lost in the ordinary
+</div>
+<div class="files-vertical">
+      <div class="file-case">
+        <img src="images/johnathan_selected.jpg" alt="File 1">
+      </div>
+
+      <div class="file-case">
+        <img src="images/queen_selected.jpg" alt="File 2">
+      </div>
+
+      <div class="file-case">
+        <img src="images/kai.jpg" alt="File 3">
+      </div>
+    </div>  
+
+ <div class="narration-container">
+  <div class="narration-box">
+    <div class="narration-text" id="narration-text"></div>
+  </div>
+
+  <div class="narration-buttons" id="narration-buttons">
+  </div>
+
+  <div class="quiz" id="quiz">
+    <p class="quiz-question" id="quizQuestion"></p>
+    <div class="quiz-options" id="quizOptions"></div>
+    <p class="quiz-feedback" id="quizFeedback"></p>
+  </div>
+</div>
+<body class="profile-page">      
+</div>
+</body>
+<audio id="hoverSound" src="images/hover.mp3" preload="auto"></audio>
+<audio id="clickSound" src="images/next.mp3" preload="auto"></audio>
+</body>
+
+<script>
+let narrationActive = true; 
+
+const text = "Click around and see what happens. Every detail could be a clue. 🕵️‍♀️";
+const target = document.getElementById("narration-text");
+
+let i = 0;
+
+function type() {
+  if (i < text.length) {
+    target.textContent += text.charAt(i);
+    i++;
+    setTimeout(type, 40);
+  }
+}
+const hintSound = new Audio('images/hint.mp3');
+hintSound.load(); 
+// start typing AFTER box fades in
+setTimeout(() => {
+  type();               // run the typewriter
+  narrationActive = false; // enable clicks after narration finishes
+}, 600);const hoverElements = document.querySelectorAll(".hover-zoom");
+
+function type() {
+  if (i < text.length) {
+    target.textContent += text.charAt(i);
+    i++;
+    setTimeout(type, 40);
+  }
+}
+
+const hoverSound = document.getElementById('hoverSound');
+const clickSound = document.getElementById('clickSound');
+
+// File cases (hover + click)
+const fileCases = document.querySelectorAll('.file-case, .next-btn:active');
+fileCases.forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    hoverSound.currentTime = 0;
+    hoverSound.play().catch(() => {});
+  });
+  el.addEventListener('click', () => {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {});
+  });
+});
+
+// Retry and Next buttons (click only)
+const buttons = document.querySelectorAll('.retry-btn, .next-btn');
+buttons.forEach(btn => {
+  el.addEventListener('mouseenter', () => {
+    hoverSound.currentTime = 0;
+    hoverSound.play().catch(() => {});
+  });
+});
+
+// Quiz element (click only, no hover)
+const quizEl = document.querySelector('.quiz');
+quizEl.addEventListener('click', () => {
+  clickSound.currentTime = 0;
+  clickSound.play().catch(() => {});
+});
+
+const allHoverElements = document.querySelectorAll('.hover-zoom, .file-case');
+
+allHoverElements.forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    // Don't play hover sound if element is answered
+    if (el.dataset.answered === "true") return;
+
+    hoverSound.currentTime = 0; // restart sound
+    hoverSound.play().catch(() => {}); // play safely
+
+    // Optional: stop after a duration if you have one
+    // setTimeout(() => { hoverSound.pause(); }, playDuration * 1000);
+  });
+});
+
+const targets = document.querySelectorAll(".hover-zoom");
+const quiz = document.querySelector(".quiz");
+const quizQuestion = document.getElementById("quizQuestion");
+const quizOptions = document.getElementById("quizOptions");
+const quizFeedback = document.getElementById("quizFeedback");
+const narrationBox = document.querySelector(".narration-box");
+const narrationText = document.getElementById("narration-text");
+
+let answeredCorrectly = new Set();
+let quizzesLocked = false;
+
+targets.forEach(el => {
+  el.addEventListener("click", () => {
+    if (narrationActive || quizzesLocked) return; 
+    if (el.dataset.answered === "true") return;
+
+    // Hide narration box temporarily
+    narrationBox.classList.add("hidden"); 
+
+    // Show quiz
+    quiz.classList.add("show");
+
+    const question = el.dataset.question;
+    const options = el.dataset.options.split("|");
+    const correctIndex = parseInt(el.dataset.answer);
+
+    quizQuestion.textContent = question;
+    quizOptions.innerHTML = "";
+    quizFeedback.textContent = "";
+
+    options.forEach((opt, index) => {
+      const btn = document.createElement("button");
+      btn.className = "quiz-btn";
+      btn.textContent = opt;
+
+      btn.onclick = () => {
+        if (narrationActive) return;
+
+        const isCorrect = index === correctIndex;
+
+        // Apply visual feedback
+        if (el.tagName === "IMG") {
+          el.classList.add(isCorrect ? "correct-outline" : "wrong-outline");
+        } else {
+          el.classList.add(isCorrect ? "correct-text" : "wrong-text");
+        }
+
+        // Mark as answered and record correctness
+        el.dataset.answered = "true";
+        el.dataset.correct = isCorrect;
+
+        if (isCorrect) {
+          answeredCorrectly.add(el);
+        } else {
+          answeredCorrectly.delete(el);
+        }
+
+        // Fade out quiz
+        quiz.classList.add("fade-out");
+        setTimeout(() => {
+          quiz.classList.remove("show", "fade-out");
+          narrationBox.classList.remove("hidden");
+        }, 300);
+
+        // Check if all quizzes have been attempted
+        if ([...targets].every(t => t.dataset.answered === "true")) {
+          quizzesLocked = true;
+          handleAllAttempted();
+        }
+      };
+
+      quizOptions.appendChild(btn);
+    });
+  });
+});
+
+// handle after all 4 are attempted
+function handleAllAttempted() {
+  const allCorrect = [...targets].every(el => el.dataset.correct === "true");
+
+  if (allCorrect) {
+    typeNarration("Nice work! You spotted all the red flags. ✅ You're ready to move on.", true);
+  } else {
+    typeNarration("Some red flags slipped by. Take another look before moving on. ❌", false, true);
+  }
+}
+
+// type narration with optional retry button
+function typeNarration(text, showNext = false, showRetry = false) {
+  narrationText.textContent = "";
+  narrationActive = true; // disable clicks while typing
+  let idx = 0;
+
+  function typeChar() {
+    if (idx < text.length) {
+      narrationText.textContent += text.charAt(idx);
+      idx++;
+      setTimeout(typeChar, 35);
+    } else {
+      narrationActive = false; // <-- enable all clicks now
+      if (showNext) insertNextButton();
+      if (showRetry) insertRetryButtons();
+    }
+  }
+
+  typeChar();
+}
+
+// remove existing buttons before adding new ones
+function clearNarrationButtons() {
+  const existingBtns = narrationBox.querySelectorAll(".next-btn, .retry-btn");
+  existingBtns.forEach(btn => btn.remove());
+}
+
+function insertRetryButtons() {
+  const btnContainer = document.getElementById("narration-buttons");
+  btnContainer.innerHTML = ""; // clear previous buttons
+
+  const btn = document.createElement("button");
+  btn.textContent = "Retry";
+  btn.className = "retry-btn";
+
+  btn.onclick = () => {
+    // reset all wrong quizzes
+    targets.forEach(el => {
+      if (el.dataset.correct !== "true") {
+        el.dataset.answered = "false";
+        el.dataset.correct = "false";
+
+        if (el.tagName === "IMG") {
+          el.classList.remove("wrong-outline", "correct-outline");
+        } else {
+          el.classList.remove("wrong-text", "correct-text");
+        }
+      }
+    });
+
+    // clear retry button
+    btn.remove();
+
+    // reset answeredCorrectly set
+    answeredCorrectly = new Set([...targets].filter(t => t.dataset.correct === "true"));
+
+    // unlock quizzes
+    quizzesLocked = false;
+    narrationActive = false;
+  };
+
+  btnContainer.appendChild(btn); // append to the outer container
+}
+
+// next button outside narration box
+function insertNextButton() {
+  const btnContainer = document.getElementById("narration-buttons");
+  btnContainer.innerHTML = ""; // remove any existing buttons
+
+  const btn = document.createElement("button");
+  btn.textContent = "Next";
+  btn.className = "next-btn";
+
+  btn.onclick = () => {
+    window.location.href = "texting-kai.html";
+  };
+
+  btnContainer.appendChild(btn); // append to the outer container
+}
+
+function handleAllAttempted() {
+  const allCorrect = [...targets].every(el => el.dataset.correct === "true");
+
+  if (allCorrect) {
+    typeNarration("Nice work! You spotted all the red flags. ✅ You're ready to move on.", true);
+  } else {
+    typeNarration("Some red flags slipped by. Take another look before moving on. ❌", false, true);
+  }
+}
+
+// type narration with optional next or retry buttons
+function typeNarration(text, showNext = false, showRetry = false) {
+  narrationText.textContent = "";
+  narrationActive = true;
+  let idx = 0;
+
+  function typeChar() {
+    if (idx < text.length) {
+      narrationText.textContent += text.charAt(idx);
+      idx++;
+      setTimeout(typeChar, 35);
+    } else {
+      narrationActive = false; // enable clicks
+      if (showNext) insertNextButton();
+      if (showRetry) insertRetryButtons();
+    }
+  }
+
+  typeChar();
+}
+
+function insertRetryButtons() {
+  const btnContainer = document.getElementById("narration-buttons");
+  btnContainer.innerHTML = "";
+
+  const btn = document.createElement("button");
+  btn.textContent = "Retry";
+  btn.className = "retry-btn";
+
+  btn.onclick = () => {
+    // reset wrong quizzes
+    targets.forEach(el => {
+      if (el.dataset.correct !== "true") {
+        el.dataset.answered = "false";
+        el.dataset.correct = "false";
+
+        if (el.tagName === "IMG") {
+          el.classList.remove("wrong-outline", "correct-outline");
+        } else {
+          el.classList.remove("wrong-text", "correct-text");
+        }
+      }
+    });
+
+    btn.remove(); // remove retry button
+    answeredCorrectly = new Set([...targets].filter(t => t.dataset.correct === "true"));
+    quizzesLocked = false;
+    narrationActive = false;
+  };
+
+  btnContainer.appendChild(btn);
+}
+
+function insertNextButton() {
+  const btnContainer = document.getElementById("narration-buttons");
+  btnContainer.innerHTML = "";
+
+  const btn = document.createElement("button");
+  btn.textContent = "Next";
+  btn.className = "next-btn";
+
+  btn.onclick = () => {
+    window.location.href = "texting-kai.html";
+  };
+
+  btnContainer.appendChild(btn);
+}
+
+
+</script>
+
+
+<style>
+  .narration-box {
+  pointer-events: none; /* Let clicks pass through */
+  
+}
+
+.kai-image {
+  width: 220px;
+  height: auto;
+  position: absolute; 
+  left: 270px;
+  top: 100px;
+  cursor: pointer;
+}
+
+.profile-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-left img {
+  width: 220px;
+  height: auto;
+}
+
+.profile-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.kai-username {
+  text-align: left;
+  position: absolute;
+  top: 120px;
+  left: 520px;
+  font-family:'Blinker', sans-serif;
+  font-size: 24px;
+}
+
+.kai-name{
+ text-align: left;
+  position: absolute;
+ top: 160px;
+ left: 520px;
+ font-family:'Blinker', sans-serif;
+ font-size: 20px;
+}
+
+.kai-bio{
+ text-align: left;
+  position: absolute;
+ top: 190px;
+ left: 520px;
+ font-family:'Blinker', sans-serif;
+ font-size: 20px;
+}
+.hover-enlarge {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform-origin: left center; /* grows naturally from left */
+  cursor: pointer;
+}
+
+.hover-enlarge:hover {
+  transform: scale(1.1); /* adjust size if needed */
+  z-index: 20;            /* stays above other elements */
+}
+
+.kai-image.hover-enlarge:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  border-radius: 12px;
+}
+.hover-enlarge:hover {
+  transform: scale(1.1);
+  color: #535fa8;
+}
+/* Hover zoom effect */
+.hover-zoom {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.hover-zoom:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.quiz {
+  position: absolute;
+  bottom: 140px;
+  left: 260px; /* pushes it away from file cases */
+  width: 360px;
+
+  padding: 18px 20px 6px;
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(255,255,255,0.18),
+      rgba(95,126,164,0.85)
+    );
+
+  font-family: 'Blinker', sans-serif;
+  color: #fff;
+
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.25);
+
+  z-index: 30;
+}
+
+.quiz-question {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+}
+
+.quiz {
+  width: 500px; /* matches narration width */
+  padding: 20px 24px;
+  border-radius: 18px;
+  background: rgba(25, 30, 60, 0.95); /* dark blue/purple base */
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-family: 'Blinker', sans-serif;
+  font-size: 16px;
+  box-shadow:
+    0 0 20px rgba(100, 180, 255, 0.3),
+    0 4px 28px rgba(0,0,0,0.45);
+  z-index: 50;
+
+  position: absolute;
+  bottom: 0;           /* align to container bottom */
+  left: 50%;
+  transform: translateX(-50%) translateY(20px); /* slightly below for entry animation */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.quiz.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0); /* slide up in */
+}
+
+.quiz-question {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 14px;
+  text-shadow: 0 0 6px rgba(100, 180, 255, 0.5);
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quiz-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(100,180,255,0.15),
+    rgba(50,120,255,0.2)
+  );
+  border: 1px solid rgba(100,180,255,0.5);
+  border-radius: 999px;
+  padding: 12px 20px;
+  color: #cce6ff;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 0 6px rgba(100,180,255,0.2);
+}
+
+.quiz-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, rgba(100,180,255,0.3), rgba(50,120,255,0.35));
+  box-shadow: 0 0 12px rgba(100,180,255,0.45);
+}
+
+.quiz-btn.correct {
+  background: linear-gradient(135deg, rgba(100,255,165,0.4), rgba(50,255,120,0.5));
+  border-color: #6dff9c;
+  color: #0f1220;
+  box-shadow: 0 0 14px rgba(100,255,165,0.6);
+}
+
+.quiz-btn.wrong {
+  background: linear-gradient(135deg, rgba(255,100,100,0.3), rgba(255,50,50,0.4));
+  border-color: #ff6d6d;
+  color: #0f1220;
+  box-shadow: 0 0 14px rgba(255,100,100,0.6);
+}
+
+.quiz-feedback {
+  margin-top: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  min-height: 20px;
+  text-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
+/* answered states */
+.correct-outline {
+  outline: 4px solid #6dff9c;
+  outline-offset: 6px;
+  border-radius: 14px;
+}
+
+.wrong-outline {
+  outline: 4px solid #ff6d6d;
+  outline-offset: 6px;
+  border-radius: 14px;
+}
+
+.correct-text {
+  color: #6dff9c !important;
+}
+
+.wrong-text {
+  color: #ff6d6d !important;
+}
+
+/* fade quiz out after answer */
+.quiz.fade-out {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+.narration-box {
+  position: absolute; 
+  bottom: 100px;
+  left: 56%;
+  transform: translateX(-50%);
+  width: 500px;
+  padding: 15px 20px;
+  background-color: rgba(95, 126, 164, 0.85);
+  color: #fff;
+  font-family: 'Blinker', sans-serif;
+  font-size: 16px;
+  border-radius: 5px;
+  text-align: left;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  overflow: hidden;
+
+  transition: opacity 0.3s ease; /* Smooth fade */
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.narration-box.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* fade-in */
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+
+/* blinking cursor */
+#narration-text::after {
+  content: "|";
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.done-btn {
+  background: transparent;
+  border: 1px solid var(--accent-soft);
+  color: var(--accent-soft);
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  display: none;
+}
+
+.done-btn:hover {
+  background: var(--accent-soft);
+  color: #0f1220;
+}
+
+.done-btn:active {
+  transform: scale(0.96);
+}
+
+.narration-container {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center; /* vertically align buttons with narration box */
+  z-index: 60;
+  gap: 16px; /* space between narration box and buttons */
+}
+
+/* Buttons stacked vertically on the right */
+.narration-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* space between Retry and Next */
+  position: relative;
+}
+
+/* General button style */
+.narration-buttons button {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Blinker', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.25s ease;
+}
+
+/* Retry button – grey/purple theme */
+.retry-btn {
+  background: linear-gradient(135deg, rgba(95, 126, 164, 0.85), rgba(138, 138, 138, 0.9));
+  color: #ffffff;
+  position: absolute;
+  bottom: 105px;
+  left: 270px;
+}
+
+.retry-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+.retry-btn:active {
+  transform: scale(0.95);
+}
+
+/* Next button – blue/purple theme */
+.next-btn {
+  background: linear-gradient(135deg, rgba(100, 180, 255, 0.85), rgba(95, 126, 164, 0.9));
+  color: #ffffff;
+  position: absolute;
+  bottom: 105px;
+  left: 270px;
+}
+
+.next-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+.next-btn:active {
+  transform: scale(0.95);
+}
+
+.profile-page .files-vertical {
+  position: absolute;       
+  top: -50px;                
+  left: -60px;               
+  display: flex;
+  flex-direction: column;   
+  gap: 0px;                /* space between files */
+  z-index: 10;
+  
+}
+
+/* Rotate the entire card */
+.profile-page .files-vertical .file-case:nth-child(1) {
+  transform: scale(1.1) rotate(60deg);   /* rotate the card */
+  z-index: 10;
+}
+
+.profile-page .files-vertical .file-case:nth-child(2) {
+  transform: rotate(60deg);
+  z-index: 20;
+}
+
+.profile-page .files-vertical .file-case:nth-child(3) {
+  transform: scale(1.3) rotate(60deg);
+  z-index: 30;
+}
+
+/* Keep the image upright inside the rotated card */
+.profile-page .files-vertical .file-case img {
+  transform: rotate(0deg);  /* reset image rotation */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.profile-page .files-vertical .file-case:last-child img {
+  box-shadow:
+    0 0 18px rgba(0, 122, 255, 0.55),
+    0 0 36px rgba(0, 122, 255, 0.25),
+    0 25px 40px rgba(0,0,0,0.3);
+  transition: none; /* no animation on hover */
+}
+.profile-page .files-vertical .file-case:not(:last-child):hover {
+  transform: translateY(-30px) scale(1.1) rotate(60deg);
+  box-shadow:
+    0 0 18px rgba(0, 122, 255, 0.55),
+    0 0 36px rgba(0, 122, 255, 0.25),
+    0 25px 40px rgba(0,0,0,0.3); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+</style>
+
